@@ -26,6 +26,11 @@ The following configuration has been succesfully tested for building and running
 
 ### Project TODOs
 
+- []  Support for JWS JSON serialization
+- []  Support for JWS Unprotected Header values
+- []  Support for Public Header Parameter Names
+- []  Support for Private Header Parameter Names
+
 ### Documentation
 
 ## Security Conciderations

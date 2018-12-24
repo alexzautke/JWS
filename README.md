@@ -20,7 +20,7 @@ The following configuration has been succesfully tested for building and running
 * Visual Studio for Mac - Version 8.0
 * .Net Core - Version 2.1.302
 
-[![Build Status](https://travis-ci.com/alexzautke/JWK.svg?branch=master)](https://travis-ci.com/alexzautke/JWS)
+[![Build Status](https://travis-ci.com/alexzautke/JWS.svg?branch=master)](https://travis-ci.com/alexzautke/JWS)
 
 ## Limitations
 

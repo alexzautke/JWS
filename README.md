@@ -26,10 +26,13 @@ The following configuration has been succesfully tested for building and running
 
 ### Project TODOs
 
-- []  Support for JWS JSON serialization
-- []  Support for JWS Unprotected Header values
-- []  Support for Public Header Parameter Names
-- []  Support for Private Header Parameter Names
+- [] Support for JWS JSON serialization
+- [] Support for JWS Unprotected Header values
+- [] Support for Public Header Parameter Names
+- [] Support for Private Header Parameter Names
+- [] Support for x5u, x5c, x5t, x5t#S256 header parameters
+- [] Support for "jku" header parameter / jku key retrieval
+- [] Support for "crit" header parameter
 
 ### Documentation
 

@@ -66,10 +66,12 @@ namespace CreativeCode.JWS
         public byte[] HMACSignature(string symetricKey)
         {
             JObject parsedPrivateKeyJSON = JObject.Parse(symetricKey);
-            var key = Base64urlDecode(KeyParameter("k", parsedPrivateKeyJSON)); // key is padded by HMACSHA* implementation to provide add least a security of 64 bytes
             var alg = KeyParameter("alg", parsedPrivateKeyJSON);
+            if (!CheckAlgNames(alg))
+                throw new CryptographicException("Value of 'alg' provided in the JWS JOSE header needs to match the 'alg' header in the JWK. Expected: " + _jwkProvider.Algorithm() + " Found: " + alg);
 
             HMAC hmac;
+            var key = Base64urlDecode(KeyParameter("k", parsedPrivateKeyJSON)); // key is padded by HMACSHA* implementation to provide add least a security of 64 bytes
             switch (alg)
             {
                 case "HS256":
@@ -98,14 +100,17 @@ namespace CreativeCode.JWS
         public byte[] ECDSA_Signature(string privateKey)
         {
             JObject parsedPrivateKeyJSON = JObject.Parse(privateKey);
+            var alg = KeyParameter("alg", parsedPrivateKeyJSON);
+            if (!CheckAlgNames(alg))
+                throw new CryptographicException("Value of 'alg' provided in the JWS JOSE header needs to match the 'alg' header in the JWK. Expected: " + _jwkProvider.Algorithm() + " Found: " + alg);
+
             var ecParameters = new ECParameters();
             ecParameters.Q.X = Base64urlDecode(KeyParameter("x", parsedPrivateKeyJSON));
             ecParameters.Q.Y = Base64urlDecode(KeyParameter("y", parsedPrivateKeyJSON));
             ecParameters.D = Base64urlDecode(KeyParameter("d", parsedPrivateKeyJSON));
 
             HashAlgorithmName sha;
-            var algorithm = KeyParameter("alg", parsedPrivateKeyJSON);
-            var keyLength = algorithm.Split("ES")[1]; // Algorithm = 'ES' + Keylength
+            var keyLength = alg.Split("ES")[1]; // Algorithm = 'ES' + Keylength
             var curveName = "P-" + keyLength;
             Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
             switch (keyLength)
@@ -123,7 +128,7 @@ namespace CreativeCode.JWS
                     curveOid = new Oid("1.3.132.0.35");
                     break;
                 default:
-                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + algorithm);
+                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + alg);
             }
             var curve = ECCurve.CreateFromOid(curveOid);
             ecParameters.Curve = curve;
@@ -166,6 +171,11 @@ namespace CreativeCode.JWS
         public byte[] SigningInput()
         {
             return ASCII(Base64urlEncode(UTF8(_joseHeader.ToString())) + "." + Base64urlEncode(_jwsPayload));
+        }
+
+        public bool CheckAlgNames(string jwkAlg)
+        {
+            return _jwkProvider.Algorithm().Equals(jwkAlg);
         }
 
         #endregion Crypto helper methods

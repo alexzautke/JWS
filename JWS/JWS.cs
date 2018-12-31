@@ -32,6 +32,7 @@ namespace CreativeCode.JWS
             _jwsPayload = jwsPayload;
 
             var keyType = _jwkProvider.KeyType();
+            var key = _jwkProvider.PrivateJWK();
             switch (keyType)
             {
                 case "EC":
@@ -41,7 +42,7 @@ namespace CreativeCode.JWS
                     _jwsSignature = RSASSA_PKCS1_v1_5_Signature();
                     break;
                 case "oct":
-                    _jwsSignature = HMACSignature();
+                    _jwsSignature = HMACSignature(key);
                     break;
                 default:
                     throw new ArgumentException("Can not create a signature with key with KeyType: " + keyType);
@@ -62,9 +63,29 @@ namespace CreativeCode.JWS
         #region Signature
 
         // HMAC using SHA-256 / SHA-384 / SHA-512
-        public byte[] HMACSignature()
+        public byte[] HMACSignature(string symetricKey)
         {
-            throw new NotImplementedException("HMAC signatures are not yet supported!");
+            JObject parsedPrivateKeyJSON = JObject.Parse(symetricKey);
+            var key = Base64urlDecode(KeyParameter("k", parsedPrivateKeyJSON)); // key is padded by HMACSHA* implementation to provide add least a security of 64 bytes
+            var alg = KeyParameter("alg", parsedPrivateKeyJSON);
+
+            HMAC hmac;
+            switch (alg)
+            {
+                case "HS256":
+                    hmac = new HMACSHA256(key);
+                    break;
+                case "HS384":
+                    hmac = new HMACSHA384(key);
+                    break;
+                case "HS512":
+                    hmac = new HMACSHA512(key);
+                    break;
+                default:
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + alg + " (Could not parse expected SHA version)");
+            }
+
+            return hmac.ComputeHash(SigningInput());
         }
 
         // RSASSA-PKCS1-v1_5 using SHA-256 / SHA-384 / SHA-512

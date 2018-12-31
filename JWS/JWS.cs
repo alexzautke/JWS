@@ -86,7 +86,7 @@ namespace CreativeCode.JWS
 
         private string JSONSerialization()
         {
-            return JsonConvert.SerializeObject(this);
+            throw new NotImplementedException("JWS JSON Serialization is not yet supported!");
         }
 
         #endregion Serialization

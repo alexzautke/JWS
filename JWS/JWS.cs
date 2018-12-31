@@ -36,7 +36,7 @@ namespace CreativeCode.JWS
             switch (keyType)
             {
                 case "EC":
-                    _jwsSignature = Oct_Signature();
+                    _jwsSignature = ECDSA_Signature(key);
                     break;
                 case "RSA":
                     _jwsSignature = RSASSA_PKCS1_v1_5_Signature();
@@ -95,10 +95,42 @@ namespace CreativeCode.JWS
         }
 
         // ECDSA using (P-256 / P-384 / P-521) and SHA-256 / SHA-384 / SHA-512
-        // None
-        public byte[] Oct_Signature()
+        public byte[] ECDSA_Signature(string privateKey)
         {
-            throw new NotImplementedException("ECDSA / None signatures are not yet supported!");
+            JObject parsedPrivateKeyJSON = JObject.Parse(privateKey);
+            var ecParameters = new ECParameters();
+            ecParameters.Q.X = Base64urlDecode(KeyParameter("x", parsedPrivateKeyJSON));
+            ecParameters.Q.Y = Base64urlDecode(KeyParameter("y", parsedPrivateKeyJSON));
+            ecParameters.D = Base64urlDecode(KeyParameter("d", parsedPrivateKeyJSON));
+
+            HashAlgorithmName sha;
+            var algorithm = KeyParameter("alg", parsedPrivateKeyJSON);
+            var keyLength = algorithm.Split("ES")[1]; // Algorithm = 'ES' + Keylength
+            var curveName = "P-" + keyLength;
+            Oid curveOid = null; // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
+            switch (keyLength)
+            {
+                case "256":
+                    sha = HashAlgorithmName.SHA256;
+                    curveOid = new Oid("1.2.840.10045.3.1.7");
+                    break;
+                case "384":
+                    sha = HashAlgorithmName.SHA384;
+                    curveOid = new Oid("1.3.132.0.34");
+                    break;
+                case "512":
+                    sha = HashAlgorithmName.SHA512;
+                    curveOid = new Oid("1.3.132.0.35");
+                    break;
+                default:
+                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + algorithm);
+            }
+            var curve = ECCurve.CreateFromOid(curveOid);
+            ecParameters.Curve = curve;
+            ecParameters.Validate();
+
+            var ecdsa = ECDsa.Create(ecParameters);
+            return ecdsa.SignData(SigningInput(), sha);
         }
 
         #endregion Signature

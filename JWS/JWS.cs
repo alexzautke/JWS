@@ -93,6 +93,11 @@ namespace CreativeCode.JWS
 
         #region Crypto helper methods
 
+        public byte[] SigningInput()
+        {
+            return ASCII(Base64urlEncode(UTF8(_joseHeader.ToString())) + "." + Base64urlEncode(_jwsPayload));
+        }
+
         #endregion Crypto helper methods
 
         #region Helper methods

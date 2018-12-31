@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWS
 {
@@ -92,6 +93,15 @@ namespace CreativeCode.JWS
         #endregion Serialization
 
         #region Crypto helper methods
+
+        public string KeyParameter(string index, JObject key)
+        {
+            var value = key[index];
+            if (value == null)
+                throw new CryptographicException("Invalid key provided for algorithm: " + _jwkProvider.Algorithm() + ". Missing key parameter: " + index);
+
+            return value.ToString();
+        }
 
         public byte[] SigningInput()
         {

@@ -91,8 +91,11 @@ namespace CreativeCode.JWS
 
         #endregion Serialization
 
-        #region Helper functions
+        #region Crypto helper methods
 
+        #endregion Crypto helper methods
+
+        #region Helper methods
         private byte[] UTF8(string s)
         {
             return Encoding.UTF8.GetBytes(s);
@@ -132,7 +135,7 @@ namespace CreativeCode.JWS
                 throw new ArgumentException(argumentName + " must not be null!");
         }
 
-        # endregion Helper functions
+        # endregion Helper methods
     }
 
 }

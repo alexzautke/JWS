@@ -8,10 +8,12 @@ namespace CreativeCode.JWS
 {
     public class JWS
     {
+        // JWS parts
         private JOSEHeader _joseHeader;
-        private byte[] _jwsPayload;
-        private byte[] _jwsSignature;
+        private byte[] _jwsPayload;     // Raw value, NOT base64 encoded
+        private byte[] _jwsSignature;   // Raw value, NOT base64 encoded
 
+        // Internal
         private IJWKProvider _jwkProvider;
 
         public JWS(IJWKProvider jwkProvider)
@@ -22,6 +24,10 @@ namespace CreativeCode.JWS
 
         public string SerializeJWSWithOptions(JOSEHeader joseHeader, byte[] jwsPayload, SerializationOption serializationOption)
         {
+            CheckNotNull(joseHeader, nameof(joseHeader));
+            CheckNotNull(jwsPayload, nameof(jwsPayload));
+            CheckNotNull(serializationOption, nameof(serializationOption));
+
             _joseHeader = joseHeader;
             _jwsPayload = jwsPayload;
 

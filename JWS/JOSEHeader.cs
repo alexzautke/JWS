@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace CreativeCode.JWS
@@ -45,7 +47,25 @@ namespace CreativeCode.JWS
             Algorithm = jwkProvider.Algorithm();
             JWK = jwkProvider.PublicJWK();
             KeyID = jwkProvider.KeyId();
-            ContentType = contentType;
+            ContentType = ShortenContentType(contentType);
+        }
+
+        /*
+        To keep messages compact in common situations, it is RECOMMENDED that
+        producers omit an "application/" prefix of a media type value in a
+        "cty" Header Parameter when no other '/' appears in the media type
+        value.
+
+        See RFC7515 - Section 4.1.10.  "cty" (Content Type) Header Parameter
+
+        */
+        public string ShortenContentType(string contentType)
+        {
+            Regex shortContentTypeSplit = new Regex(@"(?<backslash>/+)", RegexOptions.Compiled);
+            if (shortContentTypeSplit.Match(contentType).Captures.Count > 1)
+                return contentType;
+            else
+                return shortContentTypeSplit.Split(contentType).Last(); // Split : ["application", "/", "contentTyp"]
         }
     }
 }

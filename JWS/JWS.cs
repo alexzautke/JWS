@@ -96,6 +96,12 @@ namespace CreativeCode.JWS
         #endregion Crypto helper methods
 
         #region Helper methods
+
+        private byte[] ASCII(string s)
+        {
+            return Encoding.ASCII.GetBytes(s);
+        }
+
         private byte[] UTF8(string s)
         {
             return Encoding.UTF8.GetBytes(s);

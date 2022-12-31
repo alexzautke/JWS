@@ -5,20 +5,15 @@ namespace CreativeCode.JWS
     // See RFC 7515 JSON Web Signature - Section 3.1. JWS Compact Serialization Overview
     public sealed class SerializationOption
     {
-        public static readonly SerializationOption JWSCompactSerialization = new SerializationOption("JWS Compact Serialization");
-        public static readonly SerializationOption JWSJSONSerialization = new SerializationOption("JWS JSON Serialization");
+        public static readonly SerializationOption JWSCompactSerialization = new SerializationOption("JOSE");
+        public static readonly SerializationOption JWSJSONSerialization = new SerializationOption("JOSE+JSON");
 
-        private readonly string value;
+        public readonly string Name;
 
-        private SerializationOption(string value)
+        private SerializationOption(string name)
         {
-            this.value = value;
+            Name = name;
         }
-
-        public override string ToString()
-        {
-            return value;
-        }
-
+        
     }
 }

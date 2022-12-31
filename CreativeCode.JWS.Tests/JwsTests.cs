@@ -14,7 +14,7 @@ public class JwsTests
         var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
         var algorithm = Algorithm.RS256;
         var jwk = new JWK.JWK(algorithm, keyUse, keyOperations);
-        var joseHeader = new ProtectedJoseHeader(jwk, "application/fhir+json", SerializationOption.JWSCompactSerialization);
+        var joseHeader = new ProtectedJoseHeader(jwk, "application/fhir+json", SerializationOption.JwsCompactSerialization);
         var payload = Encoding.UTF8.GetBytes("payload");
 
         var jws = new JWS(joseHeader, payload);

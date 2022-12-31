@@ -46,7 +46,7 @@ namespace CreativeCode.JWS.TypeConverters
              
              */
             
-            if(jws.ProtectedJoseHeader.Type == SerializationOption.JWSCompactSerialization && protectedJoseHeaderJson.Length == 0)
+            if(jws.ProtectedJoseHeader.Type == SerializationOption.JwsCompactSerialization && protectedJoseHeaderJson.Length == 0)
                 throw new InvalidOperationException("When using the compact serialization, there MUST be a JWS Protected Header.");
             
             var urlEncodedProtectedHeader = Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson));
@@ -83,9 +83,9 @@ namespace CreativeCode.JWS.TypeConverters
             
             */
 
-            if (jws.ProtectedJoseHeader.Type == SerializationOption.JWSCompactSerialization)
+            if (jws.ProtectedJoseHeader.Type == SerializationOption.JwsCompactSerialization)
                 CompactSerialization(writer, urlEncodedProtectedHeader, urlEncodedPayload, urlEncodedSignature);
-            if (jws.ProtectedJoseHeader.Type == SerializationOption.JWSJSONSerialization)
+            if (jws.ProtectedJoseHeader.Type == SerializationOption.JwsFlattenedJsonSerialization || jws.ProtectedJoseHeader.Type == SerializationOption.JwsCompleteJsonSerialization)
                 JSONSerialization(writer, jws);
         }
 

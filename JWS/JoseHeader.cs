@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CreativeCode.JWK.KeyParts;
 using Newtonsoft.Json;
+using static CreativeCode.JWS.SerializationOption;
 
 namespace CreativeCode.JWS
 {
 
     /*
-     
+
      See RFC7517 JSON Web Signature - Section 3. JSON Web Signature (JWS) Overview       
      
      For a JWS, the JOSE Header members are the union of the members of
@@ -17,21 +19,21 @@ namespace CreativeCode.JWS
              
      In the JWS Compact Serialization, no JWS Unprotected Header is used.
 
-    In the JWS JSON Serialization, one or both of the JWS Protected
-    Header and JWS Unprotected Header MUST be present.  In this case, the
-    members of the JOSE Header are the union of the members of the JWS
-    Protected Header and the JWS Unprotected Header values that are
-    present.       
+     In the JWS JSON Serialization, one or both of the JWS Protected
+     Header and JWS Unprotected Header MUST be present.  In this case, the
+     members of the JOSE Header are the union of the members of the JWS
+     Protected Header and the JWS Unprotected Header values that are
+     present.       
              
     */
 
-    public class JOSEHeader
+    public class JoseHeader
     {
         [JsonProperty(PropertyName = "alg")]
-        public string Algorithm { get; internal set; }      // REQUIRED, must match the 'alg' value of the supplied JWK
+        public Algorithm Algorithm { get; internal set; }      // REQUIRED, must match the 'alg' value of the supplied JWK
 
         [JsonProperty(PropertyName = "jwk")]
-        public string JWK { get; internal set; }            // OPTIONAL
+        public JWK.JWK JWK { get; internal set; }           // OPTIONAL
 
         [JsonProperty(PropertyName = "kid")]
         public string KeyID { get; internal set; }          // OPTIONAL
@@ -42,11 +44,14 @@ namespace CreativeCode.JWS
         [JsonProperty(PropertyName = "cty")]
         public string ContentType { get; internal set; }    // OPTIONAL
 
-        public JOSEHeader(IJWKProvider jwkProvider, string contentType)
+        public JoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption)
         {
-            Algorithm = jwkProvider.Algorithm();
-            JWK = jwkProvider.PublicJWK();
-            KeyID = jwkProvider.KeyId();
+            if (jwk is null)
+                throw new ArgumentNullException("jwk MUST be provided");
+            
+            Algorithm = jwk.Algorithm;
+            KeyID = jwk.KeyID;
+            Type = JWSCompactSerialization.Name;
             ContentType = ShortenContentType(contentType);
         }
 
@@ -59,13 +64,13 @@ namespace CreativeCode.JWS
         See RFC7515 - Section 4.1.10.  "cty" (Content Type) Header Parameter
 
         */
-        public string ShortenContentType(string contentType)
+        private string ShortenContentType(string contentType)
         {
             Regex shortContentTypeSplit = new Regex(@"(?<backslash>/+)", RegexOptions.Compiled);
             if (shortContentTypeSplit.Match(contentType).Captures.Count > 1)
                 return contentType;
-            else
-                return shortContentTypeSplit.Split(contentType).Last(); // Split : ["application", "/", "contentTyp"]
+
+            return shortContentTypeSplit.Split(contentType).Last(); // Split : ["application", "/", "contentTyp"]
         }
     }
 }

@@ -1,10 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageVersion>0.1.0</PackageVersion>
+    <Authors>Alexander Zautke</Authors>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <PackageLicenseUrl>https://github.com/alexzautke/JWS/blob/master/LICENSE</PackageLicenseUrl>
+    <Owners>Alexander Zautke</Owners>
+    <PackageProjectUrl>https://github.com/alexzautke/JWS/</PackageProjectUrl>
+    <Title>CreativeCode.JWS</Title>
+    <ReleaseVersion>0.1.0</ReleaseVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <Summary>C# JWKs - JSON Web Keys (RFC7517)</Summary>
+    <IsPackable>true</IsPackable>
+    <PackageId>CreativeCode.JWS</PackageId>
+    <PackageTags>JSON;JWK;JOSE;RFC7517;Digital Signature;</PackageTags>
+    <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="CreativeCode.JWK" Version="0.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
 </Project>

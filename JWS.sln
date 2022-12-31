@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreativeCode.JWS", "JWS\CreativeCode.JWS.csproj", "{E356AFF7-7952-4E1E-BD8D-CAD2AC15AC62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreativeCode.JWS-Run", "JWS-Run\CreativeCode.JWS-Run.csproj", "{F6A408A0-4B3E-4591-BA26-9E4421E84D76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreativeCode.JWS.Tests", "CreativeCode.JWS.Tests\CreativeCode.JWS.Tests.csproj", "{CFD51C61-645E-4817-A21A-2B96634B90ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +15,9 @@ Global
 		{E356AFF7-7952-4E1E-BD8D-CAD2AC15AC62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E356AFF7-7952-4E1E-BD8D-CAD2AC15AC62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E356AFF7-7952-4E1E-BD8D-CAD2AC15AC62}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6A408A0-4B3E-4591-BA26-9E4421E84D76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6A408A0-4B3E-4591-BA26-9E4421E84D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6A408A0-4B3E-4591-BA26-9E4421E84D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6A408A0-4B3E-4591-BA26-9E4421E84D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFD51C61-645E-4817-A21A-2B96634B90ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFD51C61-645E-4817-A21A-2B96634B90ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFD51C61-645E-4817-A21A-2B96634B90ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFD51C61-645E-4817-A21A-2B96634B90ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

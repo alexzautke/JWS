@@ -26,7 +26,7 @@ The following configuration has been succesfully tested for building and running
 
 ### Project TODOs
 
-- [] Support for jku, x5u, x5c, x5t, x5t#S256 parameters in a protected JoseHeader
+- [] Support for jku, x5u, x5c, x5t, x5t#S256, crit parameters in a protected JoseHeader
 
 ### Documentation
 

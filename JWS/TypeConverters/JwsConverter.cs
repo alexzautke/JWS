@@ -46,7 +46,7 @@ namespace CreativeCode.JWS.TypeConverters
              
              */
             
-            if(jws.ProtectedJoseHeader.Type == SerializationOption.JwsCompactSerialization && protectedJoseHeaderJson.Length == 0)
+            if(jws.ProtectedJoseHeaders.Type == SerializationOption.JwsCompactSerialization && protectedJoseHeaderJson.Length == 0)
                 throw new InvalidOperationException("When using the compact serialization, there MUST be a JWS Protected Header.");
             
             var urlEncodedProtectedHeader = Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson));
@@ -71,7 +71,7 @@ namespace CreativeCode.JWS.TypeConverters
              
              */
 
-            var urlEncodedSignature = Base64urlEncode(jws.JwsSignature);
+            var urlEncodedSignature = Base64urlEncode(jws.JwsSignatures);
             
             /*
             
@@ -83,10 +83,10 @@ namespace CreativeCode.JWS.TypeConverters
             
             */
 
-            if (jws.ProtectedJoseHeader.Type == SerializationOption.JwsCompactSerialization)
+            if (jws.ProtectedJoseHeaders.Type == SerializationOption.JwsCompactSerialization)
                 CompactSerialization(writer, urlEncodedProtectedHeader, urlEncodedPayload, urlEncodedSignature);
-            if (jws.ProtectedJoseHeader.Type == SerializationOption.JwsFlattenedJsonSerialization || jws.ProtectedJoseHeader.Type == SerializationOption.JwsCompleteJsonSerialization)
-                JSONSerialization(writer, jws);
+            if (jws.ProtectedJoseHeaders.Type == SerializationOption.JwsFlattenedJsonSerialization || jws.ProtectedJoseHeaders.Type == SerializationOption.JwsCompleteJsonSerialization)
+                JSONSerialization(writer, urlEncodedPayload, urlEncodedProtectedHeader, urlEncodedSignature);
         }
 
         private void CompactSerialization(JsonWriter writer, string urlEncodedProtectedHeader, string urlEncodedPayload, string urlEncodedSignature)
@@ -94,9 +94,20 @@ namespace CreativeCode.JWS.TypeConverters
             writer.WriteRaw($"{urlEncodedProtectedHeader}.{urlEncodedPayload}.{urlEncodedSignature}");
         }
         
-        private void JSONSerialization(JsonWriter writer, JWS jws)
+        private void JSONSerialization(JsonWriter writer, string urlEncodedPayload, string urlEncodedProtectedHeader, string urlEncodedSignature)
         {
-            throw new NotImplementedException();
+            writer.WriteStartObject();
+            
+            writer.WritePropertyName("payload");
+            writer.WriteValue(urlEncodedPayload);
+            
+            writer.WritePropertyName("protected");
+            writer.WriteValue(urlEncodedProtectedHeader);
+            
+            writer.WritePropertyName("signature");
+            writer.WriteValue(urlEncodedSignature);
+            
+            writer.WriteEndObject();
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

@@ -1,8 +1,8 @@
 # C# JWSs - JSON Web Signature (RFC7515)
 This repository provides an implementation in C# of RFC7515 (JSON Web Signature).
 
-`Notice: The current implementation has not been used in a production environment.` 
-<br>`Here be dragons. Please fill any bugs you may find.`
+`Notice: The current implementation has been used in a production environment.` 
+<br>`However, no support will be offered for this project. Here be dragons. Please fill any bugs you may find.`
 
 ## Getting Started
 
@@ -25,6 +25,8 @@ The following configuration has been succesfully tested for building and running
 ## Limitations
 
 ### Project TODOs
+
+- [] Support for jku, x5u, x5c, x5t, x5t#S256 parameters in a protected JoseHeader
 
 ### Documentation
 

@@ -7,7 +7,7 @@ using static CreativeCode.JWK.Base64Helper;
 
 namespace CreativeCode.JWS.TypeConverters
 {
-    internal class JWSConverter : JsonConverter
+    internal class JwsConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

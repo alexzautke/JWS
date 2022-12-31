@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CreativeCode.JWS.TypeConverters;
 
-public class SerializationOptionConverter : IJWSConverter
+internal class SerializationOptionConverter : IJWSConverter
 {
     public string Serialize(object propertyValue = null)
     {

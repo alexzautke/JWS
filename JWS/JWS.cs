@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace CreativeCode.JWS
 {
-    [JsonConverter(typeof(JWSConverter))]
+    [JsonConverter(typeof(JwsConverter))]
     public class JWS
     {
         // JWS parts

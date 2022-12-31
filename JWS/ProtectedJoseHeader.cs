@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using CreativeCode.JWK.KeyParts;
+using CreativeCode.JWS.TypeConverters;
 using Newtonsoft.Json;
-using static CreativeCode.JWS.SerializationOption;
 
 namespace CreativeCode.JWS
 {
@@ -27,31 +27,35 @@ namespace CreativeCode.JWS
              
     */
 
-    public class JoseHeader
+    public class ProtectedJoseHeader
     {
         [JsonProperty(PropertyName = "alg")]
+        [JWSConverterAttribute(typeof(AlgorithmConverter))]
         public Algorithm Algorithm { get; internal set; }      // REQUIRED, must match the 'alg' value of the supplied JWK
 
         [JsonProperty(PropertyName = "jwk")]
+        [JWSConverterAttribute(typeof(JwkConverter))]
         public JWK.JWK JWK { get; internal set; }           // OPTIONAL
 
         [JsonProperty(PropertyName = "kid")]
         public string KeyID { get; internal set; }          // OPTIONAL
 
         [JsonProperty(PropertyName = "typ")]
-        public string Type { get; internal set; }           // OPTIONAL
+        [JWSConverterAttribute(typeof(SerializationOptionConverter))]
+        public SerializationOption Type { get; internal set; }           // OPTIONAL
 
         [JsonProperty(PropertyName = "cty")]
         public string ContentType { get; internal set; }    // OPTIONAL
 
-        public JoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption)
+        public ProtectedJoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption)
         {
             if (jwk is null)
                 throw new ArgumentNullException("jwk MUST be provided");
-            
+
+            JWK = jwk;
             Algorithm = jwk.Algorithm;
             KeyID = jwk.KeyID;
-            Type = JWSCompactSerialization.Name;
+            Type = serializationOption;
             ContentType = ShortenContentType(contentType);
         }
 

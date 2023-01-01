@@ -1,26 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\CreativeCode.JWS.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageVersion>0.1.0</PackageVersion>
+    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <OutputType>Library</OutputType>
     <Authors>Alexander Zautke</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageLicenseUrl>https://github.com/alexzautke/JWS/blob/master/LICENSE</PackageLicenseUrl>
     <Owners>Alexander Zautke</Owners>
     <PackageProjectUrl>https://github.com/alexzautke/JWS/</PackageProjectUrl>
-    <Title>CreativeCode.JWS</Title>
-    <ReleaseVersion>0.1.0</ReleaseVersion>
-    <SynchReleaseVersion>false</SynchReleaseVersion>
     <Summary>C# JWKs - JSON Web Keys (RFC7517)</Summary>
+    <PackageTags>JSON;JWK;JOSE;RFC7517;Digital Signature;</PackageTags>
+    <Title>CreativeCode.JWS</Title>
+    <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWS</PackageId>
-    <PackageTags>JSON;JWK;JOSE;RFC7517;Digital Signature;</PackageTags>
-    <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CreativeCode.JWK" Version="0.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
+  
 </Project>

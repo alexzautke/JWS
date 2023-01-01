@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Solution-wide properties for NuGet packaging -->
+  <PropertyGroup>
+    <VersionPrefix>0.2.0</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
+    <Authors>Alexander Zautke</Authors>
+    <Company>Creative Code Consultancy</Company>
+    <Copyright>Copyright 2018-2022 Creative Code Consultancy</Copyright>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>

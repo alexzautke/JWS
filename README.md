@@ -35,7 +35,7 @@ The following configuration has been succesfully tested for building and running
 * Visual Studio for Mac - Version 17.4.2 (build 17)
 * .Net Core - Version 6.0.402
 
-[![Build Status](https://travis-ci.com/alexzautke/JWS.svg?branch=master)](https://travis-ci.com/alexzautke/JWS)
+![Build status](https://github.com/alexzautke/JWS/actions/workflows/main.yml/badge.svg)
 
 ## Limitations
 

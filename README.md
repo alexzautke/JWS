@@ -43,6 +43,7 @@ The following configuration has been succesfully tested for building and running
 - [] Complete support for all JWK key types
 - [] Support for JWS Unprotected Header values
 - [] Support for jku, x5u, x5c, x5t, x5t#S256, crit parameters in a protected JoseHeader
+- [] Do not serialize empty "jwk" object in JWS for "oct" keys
 
 ### Documentation
 - [] Security Conciderations

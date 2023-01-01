@@ -17,12 +17,12 @@
     <Description>C# JWKs - JSON Web Keys (RFC7517)</Description>
     <IsPackable>true</IsPackable>
     <PackageId>CreativeCode.JWS</PackageId>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CreativeCode.JWK" Version="0.6.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
-  
+
 </Project>

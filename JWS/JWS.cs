@@ -97,7 +97,7 @@ namespace CreativeCode.JWS
         }
         
         // ECDSA using (P-256 / P-384 / P-521) and SHA-256 / SHA-384 / SHA-512
-        public byte[] ECDSA_Signature(ProtectedJoseHeader protectedJoseHeader)
+        private byte[] ECDSA_Signature(ProtectedJoseHeader protectedJoseHeader)
         {
             var ecParameters = new ECParameters()
             {
@@ -142,7 +142,7 @@ namespace CreativeCode.JWS
         }
         
         // HMAC using SHA-256 / SHA-384 / SHA-512
-        public byte[] HMACSignature(ProtectedJoseHeader protectedJoseHeader)
+        private byte[] HMACSignature(ProtectedJoseHeader protectedJoseHeader)
         {
             HMAC hmac;
             var key = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.OctKeyParameterK]); // key is padded by HMACSHA* implementation to provide add least a security of 64 bytes

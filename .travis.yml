@@ -1,7 +1,0 @@
-language: csharp
-mono: none
-dotnet: 2.1.302
-script:
- - cd JWS
- - dotnet restore
- - dotnet build --configuration Release

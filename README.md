@@ -41,14 +41,7 @@ The following configuration has been succesfully tested for building and running
 
 ### Project TODOs
 - [] Complete support for all JWK key types
-- [] Support for JWS JSON serialization
 - [] Support for JWS Unprotected Header values
-- [] Support for Public Header Parameter Names
-- [] Support for Private Header Parameter Names
-- [] Support for x5u, x5c, x5t, x5t#S256 header parameters
-- [] Support for "jku" header parameter
-- [] Support for "crit" header parameter
-
 - [] Support for jku, x5u, x5c, x5t, x5t#S256, crit parameters in a protected JoseHeader
 
 ### Documentation

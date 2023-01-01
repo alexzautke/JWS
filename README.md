@@ -18,8 +18,8 @@ Supported algorithms for creating a digital signature / MAC:
 
 |                | Algorithm | Support |
 |----------------|:-----------------------------|:-------------------------------|
-| RSA            | RS256, RS384, RS512          | :x:
-| Eliptic Curves | ES256, ES384, ES512          | :negative_squared_cross_mark:
+| RSA            | RS256, RS384, RS512          | :white_check_mark: 
+| Eliptic Curves | ES256, ES384, ES512          | :white_check_mark:
 | HMAC           | HS256, HS384, HS512          | :negative_squared_cross_mark:
 | None           | none                         | :x: 
 
@@ -32,8 +32,8 @@ Supported algorithms for creating a digital signature / MAC:
 ## Build
 
 The following configuration has been succesfully tested for building and running the project:
-* Visual Studio for Mac - Version 8.0
-* .Net Core - Version 2.1.302
+* Visual Studio for Mac - Version 17.4.2 (build 17)
+* .Net Core - Version 6.0.402
 
 [![Build Status](https://travis-ci.com/alexzautke/JWS.svg?branch=master)](https://travis-ci.com/alexzautke/JWS)
 
@@ -45,13 +45,29 @@ The following configuration has been succesfully tested for building and running
 - [] Support for jku, x5u, x5c, x5t, x5t#S256, crit parameters in a protected JoseHeader
 
 ### Documentation
-- [] INSTALL documentation
 - [] Security Conciderations
-- [] Describe how to run tests (Test section)
+
+## INSTALL
+
+### NuGet
+
+https://www.nuget.org/packages/CreativeCode.JWS/
+
+``dotnet add package CreativeCode.JWS``
+
+### Building from source
+
+1. ``git clone https://github.com/alexzautke/JWS.git``
+2. ``dotnet pack -c Release``
+3. [Install NuGet package from local source](https://docs.microsoft.com/en-us/nuget/consume-packages/ways-to-install-a-package)
 
 ## Usage
 
 See [JWS Example](https://gist.github.com/alexzautke/5aafda0cb1da8f17d0a8973512a066e9)
+
+## Test
+
+Simply run ``dotnet test`` in the root folder of the project. All tests should be passing.
 
 ## Security Conciderations
 

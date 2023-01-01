@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CreativeCode.JWS.TypeConverters;
 using Newtonsoft.Json;
 
@@ -15,19 +16,20 @@ namespace CreativeCode.JWS
         internal byte[] JwsPayload { get; }    // Raw value, NOT base64 encoded
         internal IEnumerable<byte[]> JwsSignatures { get; }  // Raw value, NOT base64 encoded
         
-        public JWS(IEnumerable<ProtectedJoseHeader> protectedJoseHeaderses, byte[] jwsPayload)
+        public JWS(IEnumerable<ProtectedJoseHeader> protectedJoseHeaders, byte[] jwsPayload)
         {
-            if (protectedJoseHeaderses is null)
-                throw new ArgumentNullException("joseHeader MUST be provided");
+            if (protectedJoseHeaders is null)
+                throw new ArgumentNullException("protectedJoseHeaders MUST be provided");
             if (jwsPayload is null)
-                throw new ArgumentNullException("serializationOption MUST be provided");
-            if (!protectedJoseHeaderses.Any())
-                throw new ArgumentException("At least one joseHeader MUST be provided");
+                throw new ArgumentNullException("jwsPayload MUST be provided");
+            if (!protectedJoseHeaders.Any())
+                throw new ArgumentException("At least one protected JoseHeader MUST be provided");
             if (jwsPayload.Length == 0)
                 throw new ArgumentException("jwsPayload MUST NOT be empty");
 
-            ProtectedJoseHeaders = protectedJoseHeaderses;
+            ProtectedJoseHeaders = protectedJoseHeaders;
             JwsPayload = jwsPayload;
+            JwsSignatures = new[] {Encoding.UTF8.GetBytes("Test")};
         }
 
         public string Export()

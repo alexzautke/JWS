@@ -53,32 +53,52 @@ namespace CreativeCode.JWS
 
             JwsSignatures = signatures;
         }
+
+        public static bool VerifySignature(JWK.JWK jwk, byte[] data, byte[] signature)
+        {
+            switch (jwk.KeyType.Type)
+            {
+                case "RSA": 
+                    return VerifyRSASSA_PKCS1_v1_5_Signature(jwk, data, signature);
+                case "EC":
+                    return VerifyEcdsaSignature(jwk, data, signature);
+                case "OCT":
+                    return VerifyHmacSignature(jwk, data, signature);
+                default:
+                    throw new InvalidOperationException("");
+            }
+        }
         
-        private byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader)
+        internal static byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)
         {
             var protectedJoseHeaderJson = new ProtectedJoseHeaderConverter().Serialize(protectedJoseHeader);
-            return Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + "." + Base64urlEncode(JwsPayload));
+            return Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + "." + Base64urlEncode(payload));
         }
+        
+        #endregion Signatures
+        
+        #region RSA
 
         // RSASSA-PKCS1-v1_5 using SHA-256 / SHA-384 / SHA-512
         private byte[] RSASSA_PKCS1_v1_5_Signature(ProtectedJoseHeader protectedJoseHeader)
         {
-            var rsaParameters = new RSAParameters
-            {
-                D = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterD]),
-                Exponent = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterE]),
-                Modulus = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterN]),
-                P = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterP]),
-                Q = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterQ]),
-                DP = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterDP]),
-                DQ = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterDQ]),
-                InverseQ = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.RSAKeyParameterQI]),
-            };
-            var rsa = new RSACryptoServiceProvider();
-            rsa.ImportParameters(rsaParameters);
+            var rsa = CreateRsaKeyFromJWK(protectedJoseHeader.JWK);
+            var sha = TranslateRsaHashAlgorithm(protectedJoseHeader.Algorithm);
+            
+            return rsa.SignData(SigningInput(protectedJoseHeader, JwsPayload),sha, RSASignaturePadding.Pkcs1);
+        }
 
+        private static bool VerifyRSASSA_PKCS1_v1_5_Signature(JWK.JWK jwk, byte[] data, byte[] signature)
+        {
+            var rsa = CreateRsaKeyFromJWK(jwk);
+            var sha = TranslateRsaHashAlgorithm(jwk.Algorithm);
+            return rsa.VerifyData(data, signature, sha, RSASignaturePadding.Pkcs1);
+        }
+
+        private static HashAlgorithmName TranslateRsaHashAlgorithm(Algorithm algorithm)
+        {
             HashAlgorithmName sha;
-            switch (protectedJoseHeader.Algorithm.Name)
+            switch (algorithm.Name)
             {
                 case "RS256":
                     sha = HashAlgorithmName.SHA256;
@@ -90,26 +110,54 @@ namespace CreativeCode.JWS
                     sha = HashAlgorithmName.SHA512;
                     break;
                 default:
-                    throw new CryptographicException("Could not create signature. Found invalid RSA algorithm: " + protectedJoseHeader.Algorithm.Name);
+                    throw new CryptographicException("Could not create signature. Found invalid RSA algorithm: " + algorithm.Name);
             }
-            
-            return rsa.SignData(SigningInput(protectedJoseHeader),sha, RSASignaturePadding.Pkcs1);
+
+            return sha;
+        }
+
+        private static RSACryptoServiceProvider CreateRsaKeyFromJWK(JWK.JWK jwk)
+        {
+            var rsaParameters = new RSAParameters
+            {
+                D = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterD]),
+                Exponent = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterE]),
+                Modulus = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterN]),
+                P = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterP]),
+                Q = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterQ]),
+                DP = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterDP]),
+                DQ = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterDQ]),
+                InverseQ = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterQI]),
+            };
+            var rsa = new RSACryptoServiceProvider();
+            rsa.ImportParameters(rsaParameters);
+
+            return rsa;
         }
         
+        #endregion RSA
+        
+        #region ECDSA
         // ECDSA using (P-256 / P-384 / P-521) and SHA-256 / SHA-384 / SHA-512
         private byte[] ECDSA_Signature(ProtectedJoseHeader protectedJoseHeader)
         {
-            var ecParameters = new ECParameters()
-            {
-                Curve = TranslateCurve(protectedJoseHeader.JWK.Algorithm),
-                D = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.ECKeyParameterD]),
-                Q = new ECPoint { X = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.ECKeyParameterX]), Y = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.ECKeyParameterY]) }
-            };
-            ecParameters.Validate();
-            var ecdsa = ECDsa.Create(ecParameters);
+            var ecdsa = CreateEcKeyFromJWK(protectedJoseHeader.JWK);
+            var sha = TranslateEcHashAlgorithm(protectedJoseHeader.Algorithm);
             
+            return ecdsa.SignData(SigningInput(protectedJoseHeader, JwsPayload), sha);
+        }
+        
+        private static bool VerifyEcdsaSignature(JWK.JWK jwk, byte[] data, byte[] signature)
+        {
+            var ecdsa = CreateEcKeyFromJWK(jwk);
+            var sha = TranslateEcHashAlgorithm(jwk.Algorithm);
+            return ecdsa.VerifyData(data, signature, sha);
+        }
+
+        private static HashAlgorithmName TranslateEcHashAlgorithm(Algorithm algorithm)
+        {
             HashAlgorithmName sha;
-            var keyLength = protectedJoseHeader.Algorithm.Name.Split(new string[] { "ES" }, StringSplitOptions.None)[1]; // Algorithm = 'ES' + Keylength
+            var keyLength = algorithm.Name.Split(new string[] { "ES" }, StringSplitOptions.None)[1]; // Algorithm = 'ES' + Keylength
             switch (keyLength)
             {
                 case "256":
@@ -122,14 +170,14 @@ namespace CreativeCode.JWS
                     sha = HashAlgorithmName.SHA512;
                     break;
                 default:
-                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + protectedJoseHeader.Algorithm.Name);
+                    throw new ArgumentException("Could not create ECCurve based on algorithm: " + algorithm.Name);
             }
 
-            return ecdsa.SignData(SigningInput(protectedJoseHeader), sha);
+            return sha;
         }
         
         // Workaround: Using ECCurve.CreateFromFriendlyName results in a PlatformException for NIST curves
-        private ECCurve TranslateCurve(Algorithm algorithm)
+        private static ECCurve TranslateCurve(Algorithm algorithm)
         {
             if(algorithm == Algorithm.ES256)
                 return ECCurve.CreateFromOid(new Oid("1.2.840.10045.3.1.7"));
@@ -140,13 +188,41 @@ namespace CreativeCode.JWS
             else
                 throw new InvalidOperationException($"ECKeyStore - Cannot create curve for algorithm '{algorithm}'");
         }
+
+        private static ECDsa CreateEcKeyFromJWK(JWK.JWK jwk)
+        {
+            var ecParameters = new ECParameters()
+            {
+                Curve = TranslateCurve(jwk.Algorithm),
+                D = Base64urlDecode(jwk.KeyParameters[KeyParameter.ECKeyParameterD]),
+                Q = new ECPoint { X = Base64urlDecode(jwk.KeyParameters[KeyParameter.ECKeyParameterX]), Y = Base64urlDecode(jwk.KeyParameters[KeyParameter.ECKeyParameterY]) }
+            };
+            ecParameters.Validate();
+            return ECDsa.Create(ecParameters);
+        }
+        
+        #endregion ECDSA
+        
+        #region HMAC
         
         // HMAC using SHA-256 / SHA-384 / SHA-512
         private byte[] HMACSignature(ProtectedJoseHeader protectedJoseHeader)
         {
+            var hmac = CreateHmacKeyFromJWK(protectedJoseHeader.JWK);
+            return hmac.ComputeHash(SigningInput(protectedJoseHeader, JwsPayload));
+        }
+        
+        private static bool VerifyHmacSignature(JWK.JWK jwk, byte[] data, byte[] signature)
+        {
+            var hmac = CreateHmacKeyFromJWK(jwk);
+            return hmac.ComputeHash(data).SequenceEqual(signature);
+        }
+
+        private static HMAC CreateHmacKeyFromJWK(JWK.JWK jwk)
+        {
             HMAC hmac;
-            var key = Base64urlDecode(protectedJoseHeader.JWK.KeyParameters[KeyParameter.OctKeyParameterK]); // key is padded by HMACSHA* implementation to provide add least a security of 64 bytes
-            switch (protectedJoseHeader.Algorithm.Name)
+            var key = Base64urlDecode(jwk.KeyParameters[KeyParameter.OctKeyParameterK]); // key is padded by HMACSHA* implementation to provide add least a security of 64 bytes
+            switch (jwk.Algorithm.Name)
             {
                 case "HS256":
                     hmac = new HMACSHA256(key);
@@ -158,13 +234,13 @@ namespace CreativeCode.JWS
                     hmac = new HMACSHA512(key);
                     break;
                 default:
-                    throw new CryptographicException("Could not create HMAC key based on algorithm " + protectedJoseHeader.Algorithm.Name + " (Could not parse expected SHA version)");
+                    throw new CryptographicException("Could not create HMAC key based on algorithm " + jwk.Algorithm.Name + " (Could not parse expected SHA version)");
             }
 
-            return hmac.ComputeHash(SigningInput(protectedJoseHeader));
+            return hmac;
         }
-
-        #endregion
+        
+        #endregion HMAC
 
         #region Serialization
 

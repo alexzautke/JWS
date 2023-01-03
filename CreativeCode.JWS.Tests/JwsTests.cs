@@ -4,6 +4,7 @@ using Xunit;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using static CreativeCode.JWK.Base64Helper;
+using static CreativeCode.JWS.JWS;
 
 namespace CreativeCode.JWS.Tests;
 
@@ -57,6 +58,8 @@ public class JwsTests
         
         var signature = parts.Last();
         signature.Length.Should().BePositive("A JWS signature should be present");
+
+        VerifySignature(jwk, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
     }
     
     [Fact]
@@ -107,6 +110,8 @@ public class JwsTests
         
         var signature = parts.Last();
         signature.Length.Should().BePositive("A JWS signature should be present");
+        
+        VerifySignature(jwk, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
     }
     
     [Fact]
@@ -149,6 +154,8 @@ public class JwsTests
         
         var signature = parts.Last();
         signature.Length.Should().BePositive("A JWS signature should be present");
+        
+        VerifySignature(jwk, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
     }
 
     [Fact]

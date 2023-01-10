@@ -3,7 +3,7 @@
   <!-- Solution-wide properties for NuGet packaging -->
   <PropertyGroup>
     <VersionPrefix>0.3.0</VersionPrefix>
-    <VersionSuffix>alpha</VersionSuffix>
+    <VersionSuffix></VersionSuffix>
     <Authors>Alexander Zautke</Authors>
     <Company>Creative Code Consultancy</Company>
     <Copyright>Copyright 2018-2022 Creative Code Consultancy</Copyright>

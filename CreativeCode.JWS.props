@@ -2,8 +2,8 @@
 
   <!-- Solution-wide properties for NuGet packaging -->
   <PropertyGroup>
-    <VersionPrefix>0.3.1</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
+    <VersionPrefix>0.4.0</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
     <Authors>Alexander Zautke</Authors>
     <Company>Creative Code Consultancy</Company>
     <Copyright>Copyright 2018-2022 Creative Code Consultancy</Copyright>

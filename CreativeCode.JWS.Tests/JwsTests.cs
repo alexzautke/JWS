@@ -253,4 +253,34 @@ public class JwsTests
         var signature = Encoding.UTF8.GetString(Base64urlDecode(signatures.GetValue("signature").ToString()));
         signature.Length.Should().BePositive("A JWS signature should be present");
     }
+
+    [Fact]
+    public async Task JWSCanBeSerializedInParallel()
+    {
+        void export()
+        {
+            var joseHeader = new ProtectedJoseHeader(
+                new JWK.JWK(
+                    Algorithm.RS256, 
+                    PublicKeyUse.Signature, 
+                    new HashSet<KeyOperation>(new[]
+                    {
+                        KeyOperation.ComputeDigitalSignature, 
+                        KeyOperation.VerifyDigitalSignature
+                    })
+                ), 
+                "application/fhir+json", 
+                SerializationOption.JwsCompactSerialization
+            );
+            
+            var payload = Encoding.UTF8.GetBytes("payload");
+
+            var jws = new JWS(new []{joseHeader}, payload);
+            jws.CalculateSignature();
+            jws.Export();
+        }
+        
+        var tasks = Enumerable.Range(0, 4).Select(_ => Task.Run(export));
+        await Task.WhenAll(tasks);
+    }
 }

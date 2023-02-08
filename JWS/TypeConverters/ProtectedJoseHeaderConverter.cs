@@ -10,8 +10,6 @@ namespace CreativeCode.JWS.TypeConverters
 {
     internal class ProtectedJoseHeaderConverter : IJWSConverter
     {
-        private JsonWriter _writer;
-        
         public string Serialize(object value = null)
         {
             if (!(value is ProtectedJoseHeader))
@@ -19,9 +17,9 @@ namespace CreativeCode.JWS.TypeConverters
             
             var sb = new StringBuilder();
             var sw = new StringWriter(sb);
-            _writer = new JsonTextWriter(sw);
+            var writer = new JsonTextWriter(sw);
             
-            _writer.WriteStartObject();
+            writer.WriteStartObject();
 
             var type = value.GetType();
             var properties = type.GetProperties(); // Get all public properties
@@ -38,7 +36,7 @@ namespace CreativeCode.JWS.TypeConverters
                         break; // Only serialize fields which are marked with "JsonProperty"
 
                     var customJSONPropertyName = customAttribute.NamedArguments.ElementAtOrDefault(0).TypedValue.ToString();
-                    WriteTrailingComma(head, property);
+                    WriteTrailingComma(writer, head, property);
 
                     var customConverterAttribute = property.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWSConverterAttribute));
                     if (customConverterAttribute is { }) // Let the type handle the serialization itself as there is a custom serialization needed
@@ -47,27 +45,27 @@ namespace CreativeCode.JWS.TypeConverters
                         if(customConverterType is { })
                         {
                             var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWSConverter;
-                            _writer.WriteRaw(instance.Serialize(propertyValue));
+                            writer.WriteRaw(instance.Serialize(propertyValue));
                         }
                     }
                     else if (propertyValue is IJWSConverter)
-                        _writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWSConverter)propertyValue).Serialize() + "\"");
+                        writer.WriteRaw(customJSONPropertyName + ":\"" + ((IJWSConverter)propertyValue).Serialize() + "\"");
 
                     else // Serialize system types directly
-                        _writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
+                        writer.WriteRaw(customJSONPropertyName + ":\"" + propertyValue + "\"");
                 }
             }
             
-            _writer.WriteEndObject();
+            writer.WriteEndObject();
 
             return sb.ToString();
         }
         
-        private void WriteTrailingComma(PropertyInfo head, PropertyInfo property)
+        private void WriteTrailingComma(JsonWriter writer, PropertyInfo head, PropertyInfo property)
         {
             if (property != head) // Don't start the JSON object with a comma
             {
-                _writer.WriteRaw(",");
+                writer.WriteRaw(",");
             }
         }
 

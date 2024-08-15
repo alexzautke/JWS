@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.4.0 - 2024-08-15
+
+### Fixed
+- Fixed KeyNotFoundException in case a JWS was verified using public key information only
+
 ## 0.3.1 - 2023-02-08
 
 ### Fixed

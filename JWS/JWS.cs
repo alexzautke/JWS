@@ -118,17 +118,47 @@ namespace CreativeCode.JWS
 
         private static RSACryptoServiceProvider CreateRsaKeyFromJWK(JWK.JWK jwk)
         {
-            var rsaParameters = new RSAParameters
+            var rsaParameters = new RSAParameters();
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterD, out var dValue))
             {
-                D = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterD]),
-                Exponent = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterE]),
-                Modulus = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterN]),
-                P = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterP]),
-                Q = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterQ]),
-                DP = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterDP]),
-                DQ = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterDQ]),
-                InverseQ = Base64urlDecode(jwk.KeyParameters[KeyParameter.RSAKeyParameterQI]),
-            };
+                rsaParameters.D = Base64urlDecode(dValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterE, out var eValue))
+            {
+                rsaParameters.Exponent = Base64urlDecode(eValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterN, out var nValue))
+            {
+                rsaParameters.Modulus = Base64urlDecode(nValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterP, out var pValue))
+            {
+                rsaParameters.P = Base64urlDecode(pValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterQ, out var qValue))
+            {
+                rsaParameters.Q = Base64urlDecode(qValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterDP, out var dpValue))
+            {
+                rsaParameters.DP = Base64urlDecode(dpValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterDQ, out var dqValue))
+            {
+                rsaParameters.DQ = Base64urlDecode(dqValue);
+            }
+
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.RSAKeyParameterQI, out var qiValue))
+            {
+                rsaParameters.InverseQ = Base64urlDecode(qiValue);
+            }
+
             var rsa = new RSACryptoServiceProvider();
             rsa.ImportParameters(rsaParameters);
 
@@ -194,9 +224,18 @@ namespace CreativeCode.JWS
             var ecParameters = new ECParameters()
             {
                 Curve = TranslateCurve(jwk.Algorithm),
-                D = Base64urlDecode(jwk.KeyParameters[KeyParameter.ECKeyParameterD]),
-                Q = new ECPoint { X = Base64urlDecode(jwk.KeyParameters[KeyParameter.ECKeyParameterX]), Y = Base64urlDecode(jwk.KeyParameters[KeyParameter.ECKeyParameterY]) }
             };
+            
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.ECKeyParameterD, out var dValue))
+            {
+                ecParameters.D = Base64urlDecode(dValue);
+            }
+            
+            if (jwk.KeyParameters.TryGetValue(KeyParameter.ECKeyParameterX, out var xValue) && jwk.KeyParameters.TryGetValue(KeyParameter.ECKeyParameterY, out var yValue))
+            {
+                ecParameters.Q = new ECPoint { X = Base64urlDecode(xValue), Y = Base64urlDecode(yValue) };
+            }
+            
             ecParameters.Validate();
             return ECDsa.Create(ecParameters);
         }

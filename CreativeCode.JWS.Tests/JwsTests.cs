@@ -59,7 +59,8 @@ public class JwsTests
         var signature = parts.Last();
         signature.Length.Should().BePositive("A JWS signature should be present");
 
-        VerifySignature(jwk, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
+        var publicKey = new JWK.JWK(jwk.Export());
+        VerifySignature(publicKey, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
     }
     
     [Fact]
@@ -110,8 +111,9 @@ public class JwsTests
         
         var signature = parts.Last();
         signature.Length.Should().BePositive("A JWS signature should be present");
-        
-        VerifySignature(jwk, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
+
+        var publicKey = new JWK.JWK(jwk.Export());
+        VerifySignature(publicKey, SigningInput(joseHeader, Encoding.UTF8.GetBytes("payload")), Base64urlDecode(signature)).Should().BeTrue();
     }
     
     [Fact]

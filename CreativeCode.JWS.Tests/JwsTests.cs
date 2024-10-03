@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using CreativeCode.JWK.KeyParts;
 using Xunit;
 using FluentAssertions;
@@ -284,5 +285,75 @@ public class JwsTests
         
         var tasks = Enumerable.Range(0, 4).Select(_ => Task.Run(export));
         await Task.WhenAll(tasks);
+    }
+
+    [Fact]
+    public void JwsWithAdditionalProtectedHeadersCanBeSerialized()
+    {
+        var keyUse = PublicKeyUse.Signature;
+        var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+        var algorithm = Algorithm.ES256;
+        var jwk = new JWK.JWK(algorithm, keyUse, keyOperations);
+        var payloadJson = @"{
+            ""key1"": ""test"",
+            ""key2"": ""test2"",
+            ""testArray"": [
+                {
+                    ""complexTest"": ""test"",
+                    ""success"": true
+                }
+            ]
+        }";
+        var payloadJsonNormalized = Regex.Replace(payloadJson, @"\s+", string.Empty, RegexOptions.Compiled);
+        var payload = Encoding.UTF8.GetBytes(payloadJsonNormalized);
+        var additionalHeaders = new Dictionary<string, string>()
+        {
+            {"testKey", "testValue"}
+        };
+        
+        var joseHeader = new ProtectedJoseHeader(jwk, SerializationOption.JwsCompactSerialization, "application/json", additionalHeaders);
+        var jws = new JWS(new []{joseHeader}, payload);
+        jws.CalculateSignature();
+        var jwsCompactJson = jws.Export();
+        
+        var parts = jwsCompactJson.Split(".");
+        parts.Count().Should().Be(3, "A JWS using compact serialization should consist of three parts");
+        
+        var headerJson = Encoding.UTF8.GetString(Base64urlDecode(parts.First()));
+        headerJson.Length.Should().BePositive("A JWS protected header should be present");
+        var parsedProtectedHeader = JObject.Parse(headerJson);
+        
+        parsedProtectedHeader.TryGetValue("alg", out var _).Should().BeTrue();
+        parsedProtectedHeader.TryGetValue("jwk", out var _).Should().BeTrue();
+        parsedProtectedHeader.TryGetValue("kid", out var _).Should().BeTrue();
+        parsedProtectedHeader.TryGetValue("typ", out var _).Should().BeTrue();
+        parsedProtectedHeader.TryGetValue("cty", out var _).Should().BeTrue();
+        parsedProtectedHeader.TryGetValue("testKey", out var _).Should().BeTrue();
+        
+        parsedProtectedHeader.GetValue("alg").ToString().Should().Be("ES256");
+        parsedProtectedHeader.GetValue("jwk").Children().Count().Should().Be(8);
+        var parsedJwk = JObject.Parse(parsedProtectedHeader.GetValue("jwk").ToString());
+        parsedJwk.GetValue("kty").ToString().Should().Be(jwk.KeyType.Type);
+        parsedJwk.GetValue("use").ToString().Should().Be(jwk.PublicKeyUse.KeyUse);
+        parsedJwk.GetValue("alg").ToString().Should().Be(jwk.Algorithm.Name);
+        parsedJwk.GetValue("kid").ToString().Should().Be(jwk.KeyID);
+        parsedJwk.GetValue("crv").ToString().Should().Be(jwk.KeyParameters[KeyParameter.ECKeyParameterCRV]);
+        parsedJwk.GetValue("y").ToString().Should().Be(jwk.KeyParameters[KeyParameter.ECKeyParameterY]);
+        parsedJwk.GetValue("x").ToString().Should().Be(jwk.KeyParameters[KeyParameter.ECKeyParameterX]);
+        parsedJwk.GetValue("key_ops").Values<string>().Should().BeEquivalentTo(jwk.KeyOperations.Select(op => op.Operation));
+        parsedProtectedHeader.GetValue("kid").ToString().Should().Be(jwk.KeyID);
+        parsedProtectedHeader.GetValue("typ").ToString().Should().Be("JOSE");
+        parsedProtectedHeader.GetValue("cty").ToString().Should().Be("json");
+        parsedProtectedHeader.GetValue("testKey").ToString().Should().Be("testValue");
+        
+        var payloadFromJws = Encoding.UTF8.GetString(Base64urlDecode(parts.ElementAt(1)));
+        payloadFromJws.Length.Should().BePositive("A JWS payload should be present");
+        payloadFromJws.Should().Be(payloadJsonNormalized);
+        
+        var signature = parts.Last();
+        signature.Length.Should().BePositive("A JWS signature should be present");
+
+        var publicKey = new JWK.JWK(jwk.Export());
+        VerifySignature(publicKey, SigningInput(joseHeader, Encoding.UTF8.GetBytes(payloadJsonNormalized)), Base64urlDecode(signature)).Should().BeTrue();
     }
 }

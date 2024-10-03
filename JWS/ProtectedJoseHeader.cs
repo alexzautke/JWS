@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CreativeCode.JWK.KeyParts;
@@ -10,7 +11,7 @@ namespace CreativeCode.JWS
 
     /*
 
-     See RFC7517 JSON Web Signature - Section 3. JSON Web Signature (JWS) Overview       
+     See RFC7515 JSON Web Signature - Section 3. JSON Web Signature (JWS) Overview       
      
      For a JWS, the JOSE Header members are the union of the members of
      these values:
@@ -46,17 +47,37 @@ namespace CreativeCode.JWS
 
         [JsonProperty(PropertyName = "cty")]
         public string ContentType { get; internal set; }    // OPTIONAL
+        
+        [JsonProperty()]
+        [JWSConverterAttribute(typeof(AdditionalHeadersConverter))]
+        public IReadOnlyDictionary<string, string> AdditionalHeaders { get; internal set; } // OPTIONAL
 
         public ProtectedJoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption)
         {
             if (jwk is null)
                 throw new ArgumentNullException("jwk MUST be provided");
-
+            
+            if (string.IsNullOrEmpty(contentType))
+                throw new ArgumentNullException("contentType MUST be provided and MUST NOT be empty");
+            
             JWK = jwk;
             Algorithm = jwk.Algorithm;
             KeyID = jwk.KeyID;
             Type = serializationOption;
             ContentType = ShortenContentType(contentType);
+        }
+        
+        public ProtectedJoseHeader(JWK.JWK jwk, SerializationOption serializationOption, string contentType = null, IReadOnlyDictionary<string, string> additionalHeaders = null)
+        {
+            if (jwk is null)
+                throw new ArgumentNullException("jwk MUST be provided");
+            
+            JWK = jwk;
+            Algorithm = jwk.Algorithm;
+            KeyID = jwk.KeyID;
+            Type = serializationOption;
+            ContentType = ShortenContentType(contentType);
+            AdditionalHeaders = additionalHeaders;
         }
 
         /*

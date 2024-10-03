@@ -32,8 +32,7 @@ Supported algorithms for creating a digital signature / MAC:
 ## Build
 
 The following configuration has been succesfully tested for building and running the project:
-* Visual Studio for Mac - Version 17.4.2 (build 17)
-* .Net Core - Version 6.0.402
+* .NET 8 / netstandard2.0
 
 ![Build status](https://github.com/alexzautke/JWS/actions/workflows/main.yml/badge.svg)
 

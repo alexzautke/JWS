@@ -52,7 +52,7 @@ namespace CreativeCode.JWS
         [JWSConverterAttribute(typeof(AdditionalHeadersConverter))]
         public IReadOnlyDictionary<string, string> AdditionalHeaders { get; internal set; } // OPTIONAL
 
-        public ProtectedJoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption, ContentMode contentMode = ContentMode.Complete)
+        public ProtectedJoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption)
         {
             if (jwk is null)
                 throw new ArgumentNullException("jwk MUST be provided");

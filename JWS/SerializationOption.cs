@@ -17,4 +17,10 @@ namespace CreativeCode.JWS
         }
         
     }
+
+    public enum ContentMode
+    {
+        Complete,
+        Detached
+    }
 }

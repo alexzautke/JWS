@@ -35,7 +35,7 @@ namespace CreativeCode.JWS.TypeConverters
             var customConverterAttribute = joseHeadersProperty.CustomAttributes.FirstOrDefault(a => a.AttributeType == typeof(JWSConverterAttribute));
             var customConverterType = customConverterAttribute.ConstructorArguments.FirstOrDefault(a => a.ArgumentType == typeof(Type)).Value;
             var instance = Activator.CreateInstance(customConverterType as Type, true) as IJWSConverter;
-            var joseHeaders = joseHeadersProperty.GetValue(value) as IEnumerable<ProtectedJoseHeader>;
+            var joseHeaders = (joseHeadersProperty.GetValue(value) as IEnumerable<ProtectedJoseHeader>).ToList();
 
             if (joseHeaders.Any(joseHeader => joseHeader.Type == SerializationOption.JwsCompactSerialization || joseHeader.Type == SerializationOption.JwsFlattenedJsonSerialization) && joseHeaders.Count() > 1)
                 throw new InvalidOperationException("Multiple headers/signatures are only supported using the General JWS JSON Serialization Syntax. At least one header specified a JWS Compact Serialization or Flattened JWS JSON Serialization Syntax.");
@@ -90,26 +90,32 @@ namespace CreativeCode.JWS.TypeConverters
             */
 
             if (jws.ProtectedJoseHeaders.All(protectedJoseHeader => protectedJoseHeader.Type == SerializationOption.JwsCompactSerialization))
-                CompactSerialization(writer, urlEncodedProtectedHeaders.First(), urlEncodedPayload, urlEncodedSignatures.First());
+                CompactSerialization(writer, urlEncodedProtectedHeaders.First(), urlEncodedPayload, urlEncodedSignatures.First(), jws.ContentMode);
             else if (jws.ProtectedJoseHeaders.All(protectedJoseHeader => protectedJoseHeader.Type == SerializationOption.JwsFlattenedJsonSerialization))
-                FlattenedJsonSerialization(writer, urlEncodedPayload, urlEncodedProtectedHeaders.First(), urlEncodedSignatures.First());
+                FlattenedJsonSerialization(writer, urlEncodedPayload, urlEncodedProtectedHeaders.First(), urlEncodedSignatures.First(), jws.ContentMode);
             else if (jws.ProtectedJoseHeaders.All(protectedJoseHeader => protectedJoseHeader.Type == SerializationOption.JwsCompleteJsonSerialization))
-                CompleteJsonSerialization(writer, urlEncodedPayload, urlEncodedProtectedHeaders, urlEncodedSignatures);
+                CompleteJsonSerialization(writer, urlEncodedPayload, urlEncodedProtectedHeaders, urlEncodedSignatures, jws.ContentMode);
             else
                 throw new InvalidOperationException("JWS Protected headers indicated mixed serialization options. All headers MUST use the same option.");
         }
 
-        private void CompactSerialization(JsonWriter writer, string urlEncodedProtectedHeader, string urlEncodedPayload, string urlEncodedSignature)
+        private void CompactSerialization(JsonWriter writer, string urlEncodedProtectedHeader, string urlEncodedPayload, string urlEncodedSignature, ContentMode contentMode)
         {
-            writer.WriteRaw($"{urlEncodedProtectedHeader}.{urlEncodedPayload}.{urlEncodedSignature}");
+            if(contentMode == ContentMode.Complete)
+                writer.WriteRaw($"{urlEncodedProtectedHeader}.{urlEncodedPayload}.{urlEncodedSignature}");
+            else
+                writer.WriteRaw($"{urlEncodedProtectedHeader}..{urlEncodedSignature}");
         }
         
-        private void FlattenedJsonSerialization(JsonWriter writer, string urlEncodedPayload, string urlEncodedProtectedHeader, string urlEncodedSignature)
+        private void FlattenedJsonSerialization(JsonWriter writer, string urlEncodedPayload, string urlEncodedProtectedHeader, string urlEncodedSignature, ContentMode contentMode)
         {
             writer.WriteStartObject();
             
-            writer.WritePropertyName("payload");
-            writer.WriteValue(urlEncodedPayload);
+            if (contentMode == ContentMode.Complete)
+            {
+                writer.WritePropertyName("payload");
+                writer.WriteValue(urlEncodedPayload);   
+            }
             
             writer.WritePropertyName("protected");
             writer.WriteValue(urlEncodedProtectedHeader);
@@ -120,15 +126,18 @@ namespace CreativeCode.JWS.TypeConverters
             writer.WriteEndObject();
         }
         
-        private void CompleteJsonSerialization(JsonWriter writer, string urlEncodedPayload, IEnumerable<string> urlEncodedProtectedHeaders, IEnumerable<string> urlEncodedSignatures)
+        private void CompleteJsonSerialization(JsonWriter writer, string urlEncodedPayload, IEnumerable<string> urlEncodedProtectedHeaders, IEnumerable<string> urlEncodedSignatures, ContentMode contentMode)
         {
             if (urlEncodedProtectedHeaders.Count() != urlEncodedSignatures.Count())
                 throw new InvalidOperationException("Count of protected JoseHeaders does not match count of provided signatures.");
             
             writer.WriteStartObject();
-            
-            writer.WritePropertyName("payload");
-            writer.WriteValue(urlEncodedPayload);
+
+            if (contentMode == ContentMode.Complete)
+            {
+                writer.WritePropertyName("payload");
+                writer.WriteValue(urlEncodedPayload);   
+            }
             
             writer.WritePropertyName("signatures");
             writer.WriteStartArray();

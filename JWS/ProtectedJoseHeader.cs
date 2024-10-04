@@ -44,7 +44,7 @@ namespace CreativeCode.JWS
         [JsonProperty(PropertyName = "typ")]
         [JWSConverterAttribute(typeof(SerializationOptionConverter))]
         public SerializationOption Type { get; internal set; }           // OPTIONAL
-
+        
         [JsonProperty(PropertyName = "cty")]
         public string ContentType { get; internal set; }    // OPTIONAL
         
@@ -52,7 +52,7 @@ namespace CreativeCode.JWS
         [JWSConverterAttribute(typeof(AdditionalHeadersConverter))]
         public IReadOnlyDictionary<string, string> AdditionalHeaders { get; internal set; } // OPTIONAL
 
-        public ProtectedJoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption)
+        public ProtectedJoseHeader(JWK.JWK jwk, string contentType, SerializationOption serializationOption, ContentMode contentMode = ContentMode.Complete)
         {
             if (jwk is null)
                 throw new ArgumentNullException("jwk MUST be provided");

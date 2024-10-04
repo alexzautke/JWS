@@ -19,7 +19,9 @@ namespace CreativeCode.JWS
         internal byte[] JwsPayload { get; }    // Raw value, NOT base64 encoded
         internal IEnumerable<byte[]> JwsSignatures { get; private set; }  // Raw value, NOT base64 encoded
         
-        public JWS(IEnumerable<ProtectedJoseHeader> protectedJoseHeaders, byte[] jwsPayload)
+        internal ContentMode ContentMode { get; }
+        
+        public JWS(IEnumerable<ProtectedJoseHeader> protectedJoseHeaders, byte[] jwsPayload, ContentMode contentMode = ContentMode.Complete)
         {
             if (protectedJoseHeaders is null)
                 throw new ArgumentNullException("protectedJoseHeaders MUST be provided");
@@ -32,6 +34,7 @@ namespace CreativeCode.JWS
 
             ProtectedJoseHeaders = protectedJoseHeaders;
             JwsPayload = jwsPayload;
+            ContentMode = contentMode;
         }
 
         #region Signatures

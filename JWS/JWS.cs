@@ -31,7 +31,7 @@ namespace CreativeCode.JWS
                 throw new ArgumentException("At least one protected JoseHeader MUST be provided");
             if (jwsPayload.Length == 0)
                 throw new ArgumentException("jwsPayload MUST NOT be empty");
-            if(protectedJoseHeaders.Any(protectedJoseHeader => protectedJoseHeader.AdditionalHeaders.Any(h => h.Key.Equals("b64"))) && contentMode != ContentMode.Detached)
+            if(protectedJoseHeaders.Any(protectedJoseHeader => protectedJoseHeader.AdditionalHeaders is not null && protectedJoseHeader.AdditionalHeaders.Any(h => h.Key.Equals("b64"))) && contentMode != ContentMode.Detached)
                 throw new ArgumentException("Unencoded Payload option ('b64' header) can only be used in combination with a detached content mode to avoid unsafe serialization of the JWS");
 
             ProtectedJoseHeaders = protectedJoseHeaders;
@@ -77,7 +77,7 @@ namespace CreativeCode.JWS
         internal static byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)
         {
             var protectedJoseHeaderJson = new ProtectedJoseHeaderConverter().Serialize(protectedJoseHeader);
-            if (!protectedJoseHeader.AdditionalHeaders.Any(h => h.Key.Equals("b64"))) // Regular signing input
+            if (protectedJoseHeader.AdditionalHeaders is not null && !protectedJoseHeader.AdditionalHeaders.Any(h => h.Key.Equals("b64"))) // Regular signing input
             {
                 return Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + "." + Base64urlEncode(payload));    
             }

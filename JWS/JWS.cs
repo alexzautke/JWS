@@ -70,10 +70,10 @@ namespace CreativeCode.JWS
                 case "OCT":
                     return VerifyHmacSignature(jwk, data, signature);
                 default:
-                    throw new InvalidOperationException("");
+                    throw new InvalidOperationException($"Unknown JWK key type: '{jwk.KeyType.Type}'");
             }
         }
-        
+
         internal static byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)
         {
             var protectedJoseHeaderJson = new ProtectedJoseHeaderConverter().Serialize(protectedJoseHeader);

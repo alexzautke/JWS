@@ -77,18 +77,20 @@ namespace CreativeCode.JWS
         internal static byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)
         {
             var protectedJoseHeaderJson = new ProtectedJoseHeaderConverter().Serialize(protectedJoseHeader);
-            if (protectedJoseHeader.AdditionalHeaders is not null && !protectedJoseHeader.AdditionalHeaders.Any(h => h.Key.Equals("b64"))) // Regular signing input
+            if (protectedJoseHeader.AdditionalHeaders is not null &&
+                !protectedJoseHeader.AdditionalHeaders.Any(h => h.Key.Equals("b64"))) // Regular signing input
             {
-                return Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + "." + Base64urlEncode(payload));    
+                return Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + "." +
+                                               Base64urlEncode(payload));
             }
-            else // Unencoded signing input
-            {
-                var headerBytes = Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + "."); 
-                var signingInput = new byte[headerBytes.Length + payload.Length];
-                Buffer.BlockCopy(headerBytes, 0, signingInput, 0, headerBytes.Length);
-                Buffer.BlockCopy(payload, 0, signingInput, headerBytes.Length, payload.Length);
-                return signingInput;
-            }
+
+            // Unencoded signing input
+            var headerBytes =
+                Encoding.ASCII.GetBytes(Base64urlEncode(Encoding.UTF8.GetBytes(protectedJoseHeaderJson)) + ".");
+            var signingInput = new byte[headerBytes.Length + payload.Length];
+            Buffer.BlockCopy(headerBytes, 0, signingInput, 0, headerBytes.Length);
+            Buffer.BlockCopy(payload, 0, signingInput, headerBytes.Length, payload.Length);
+            return signingInput;
         }
         
         #endregion Signatures

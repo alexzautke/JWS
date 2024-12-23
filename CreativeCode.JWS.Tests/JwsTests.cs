@@ -562,7 +562,7 @@ public class JwsTests
     }
     
     [Fact]
-    public void CompactJwsWithUnencodedPayloadWithCompleteSerializationThrowsException()
+    public void JwsWithUnencodedPayloadWithCompleteSerializationThrowsException()
     {
         var keyUse = PublicKeyUse.Signature;
         var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
@@ -581,6 +581,56 @@ public class JwsTests
         var payload = Encoding.UTF8.GetBytes("payload");
 
         Assert.Throws<ArgumentException>(() => new JWS(new []{joseHeader}, payload, ContentMode.Complete));
+    }
+    
+    [Fact]
+    public void JwsWithDuplicateCriticalHeadersThrowsException()
+    {
+        var keyUse = PublicKeyUse.Signature;
+        var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+        var algorithm = Algorithm.ES256;
+        var jwk = new JWK.JWK(algorithm, keyUse, keyOperations);
+        var additionalHeaders = new Dictionary<string, object>()
+        {
+            {"b64", false}
+        };
+        var criticalHeaders = new List<string>()
+        {
+            "b64",
+            "b64"
+        };
+        
+        Assert.Throws<ArgumentException>(() => new ProtectedJoseHeader(jwk, SerializationOption.JwsCompactSerialization, "application/json", additionalHeaders, criticalHeaders));
+    }
+    
+    [Fact]
+    public void JwsWithCriticalHeadersAndEmptyAdditionalHeadersThrowsException()
+    {
+        var keyUse = PublicKeyUse.Signature;
+        var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+        var algorithm = Algorithm.ES256;
+        var jwk = new JWK.JWK(algorithm, keyUse, keyOperations);
+        var criticalHeaders = new List<string>()
+        {
+            "b64"
+        };
+        
+        Assert.Throws<ArgumentException>(() => new ProtectedJoseHeader(jwk, SerializationOption.JwsCompactSerialization, "application/json", null, criticalHeaders));
+    }
+    
+    [Fact]
+    public void JwsWithRFC7515HeadersAsCriticalHeadersThrowsException()
+    {
+        var keyUse = PublicKeyUse.Signature;
+        var keyOperations = new HashSet<KeyOperation>(new[] {KeyOperation.ComputeDigitalSignature, KeyOperation.VerifyDigitalSignature});
+        var algorithm = Algorithm.ES256;
+        var jwk = new JWK.JWK(algorithm, keyUse, keyOperations);
+        var criticalHeaders = new List<string>()
+        {
+            "kid"
+        };
+        
+        Assert.Throws<ArgumentException>(() => new ProtectedJoseHeader(jwk, SerializationOption.JwsCompactSerialization, "application/json", null, criticalHeaders));
     }
 
     [Fact]

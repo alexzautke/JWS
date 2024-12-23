@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0 - 2024-12-23
+
+### Added
+- Added support for the 'crit' header as part of the ProtectedJoseHeader. An IReadOnlyList can be passed as part of the JWS constructor to provide the list of all critical header values. Validation of the 'crit' values is performed according to RFC7515.
+- Added support for unencoded payloads when collecting the signature input. The 'b64' unencoded payload option can be used according to RFC7797. The signature input will be generated depending on the 'b64' header value automatically.
+
+### Changed
+- The IReadOnlyDictionary for the additionalHeaders as part of the ProtectedJoseHeader is now represented as IReadOnlyDictionary<string, object> instead of IReadOnlyDictionary<string, string> to allow for all possible JSON values.
+
 ## 0.5.0 - 2024-10-04
 
 ### Added

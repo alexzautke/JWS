@@ -17,7 +17,7 @@ namespace CreativeCode.JWS.TypeConverters
             var sw = new StringWriter(sb);
             var writer = new JsonTextWriter(sw);
             
-            var additionalHeaders = propertyValue as IReadOnlyDictionary<string, string>;
+            var additionalHeaders = propertyValue as IReadOnlyDictionary<string, object>;
             foreach (var header in additionalHeaders!)
             {
                 writer.WritePropertyName(header.Key);

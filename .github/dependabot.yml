@@ -10,3 +10,6 @@ updates:
     schedule:
       interval: daily
       time: "04:00"
+    ignore:
+      - dependency-name: FluentAssertions
+        versions: [">=8.0.0"]

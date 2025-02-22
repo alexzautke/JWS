@@ -2,7 +2,7 @@
 
   <!-- Solution-wide properties for NuGet packaging -->
   <PropertyGroup>
-    <VersionPrefix>0.6.0</VersionPrefix>
+    <VersionPrefix>0.7.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Authors>Alexander Zautke</Authors>
     <Company>Creative Code Consultancy</Company>

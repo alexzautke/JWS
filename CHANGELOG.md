@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.7.0 - 2025-02-23
+### Added
+- Add ```byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)``` on JWS to facilitate the calculation of detached content
+
 ## 0.6.0 - 2024-12-23
 
 ### Added

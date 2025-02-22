@@ -74,7 +74,7 @@ namespace CreativeCode.JWS
             }
         }
 
-        internal static byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)
+        public static byte[] SigningInput(ProtectedJoseHeader protectedJoseHeader, byte[] payload)
         {
             var protectedJoseHeaderJson = new ProtectedJoseHeaderConverter().Serialize(protectedJoseHeader);
             if (protectedJoseHeader.AdditionalHeaders is not null &&
